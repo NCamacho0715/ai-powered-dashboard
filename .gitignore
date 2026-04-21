@@ -1,0 +1,14 @@
+# Entornos virtuales
+.venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Datos locales (no subir al repositorio de código)
+data/
+data/raw/
+
+# Streamlit y otros
+.streamlit/
+.idea/
+.vscode/
