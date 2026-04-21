@@ -1,31 +1,36 @@
-# AI-Powered Dashboard: Monitoreo de Disponibilidad de Tiendas
+# AI-Powered Dashboard: Monitoreo de Estabilidad del Sistema
 
-Este proyecto es una solución rápida y funcional para visualizar eventos de disponibilidad (online/offline) de tiendas, procesando múltiples fuentes de datos y ofreciendo un análisis asistido por Inteligencia Artificial.
+Este proyecto analiza la estabilidad técnica de un sistema de tiendas basado en series temporales agregadas, utilizando métricas de volatilidad y resiliencia, con un asistente inteligente integrado.
 
 ## Progreso del Proyecto
 
 ### PASO 1: Ingesta de Datos
-**Objetivo:** Consolidar información dispersa en un solo conjunto de datos manejable.
-
-*   **Fuentes:** Se procesaron **201 archivos CSV** ubicados en `data/raw`.
-*   **Desafío Técnico:** Los archivos originales venían en formato "ancho" (cada timestamp era una columna). Se implementó una lógica de transformación (**unpivot/melt**) para convertir los datos a formato "largo", donde cada fila representa un momento único en el tiempo.
-*   **Resultados de Calidad:**
-    *   **Filas procesadas:** 67,141 registros únicos.
-    *   **Limpieza:** Se detectaron y eliminaron 1,987 registros duplicados causados por el solapamiento de tiempo entre archivos.
-    *   **Rango Temporal:** Los datos cubren del **1 de febrero al 11 de febrero de 2026**.
-    *   **Integridad:** 0 valores nulos y 100% de éxito en el procesamiento de fechas.
+**Objetivo:** Consolidar información dispersa (201 CSVs) en un formato de serie temporal largo.
+*   **Filas finales:** 67,141 registros únicos.
 
 ### PASO 2: Limpieza y Transformación
-**Objetivo:** Enriquecer los datos para facilitar el análisis temporal y de disponibilidad.
+**Objetivo:** Enriquecimiento temporal (horas, días) y cálculo de variaciones (`delta`).
 
-*   **Enriquecimiento Temporal:** Se extrajeron dimensiones de fecha, hora y nombre del día para permitir análisis por franjas horarias (ej: ¿Hay más caídas en la madrugada?).
-*   **Lógica de Disponibilidad:**
-    *   Se calculó el `delta` (variación técnica) entre cada medición de 10 segundos.
-    *   **Normalización de Estados:** Se categorizó cada registro como `Stable/Online` (conteo estable o en aumento) o `Offline Event` (conteo en descenso).
-*   **Insights Detectados:**
-    *   Se identificaron **28,280 momentos de inestabilidad** (caídas en el número de tiendas visibles).
-    *   Esto permite calcular el "Uptime" técnico no solo como "está prendido o no", sino como la frecuencia de fluctuaciones.
+### PASO 3: Análisis de Estabilidad (Métricas Senior)
+**Objetivo:** Medir la salud del sistema a través de su capacidad de recuperación.
+*   **Eventos de Caída:** Umbral relativo (>1%) para normalizar el impacto.
+*   **Resiliencia:** Cálculo de *Recovery Time* tras incidentes.
+
+### PASO 4: Dashboard Interactivo (Streamlit)
+**Objetivo:** Visualizar KPIs de salud y series temporales con detección de incidentes.
+*   Gráficos dinámicos de volatilidad horaria y marcadores de fallos.
+
+### PASO 5 & 6: Chatbot Híbrido (AI Powered)
+**Objetivo:** Interfaz de lenguaje natural que no alucina.
+*   **Cerebro Matemático:** Lógica en Pandas para cálculos exactos.
+*   **Voz de AI:** Integración con **Google Gemini (2.0 Flash)** para interpretación experta.
+*   **Modo Resiliente:** El chat funciona incluso si la AI falla, usando resultados deterministas.
 
 ---
 
-*Estado actual: Datos listos y enriquecidos. Próximo paso: Cálculo de Métricas Clave.*
+## Cómo Ejecutar
+1. Instalar dependencias: `pip install pandas streamlit plotly google-genai`
+2. Ejecutar: `python -m streamlit run app.py`
+3. Ingresa tu **Gemini API Key** en la barra lateral para activar el asistente.
+
+*Proyecto finalizado para prueba técnica - Enfoque Pragmático y Senior.*
