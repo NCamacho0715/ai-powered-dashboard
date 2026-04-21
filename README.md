@@ -33,4 +33,4 @@ Este proyecto analiza la estabilidad técnica de un sistema de tiendas basado en
 2. Ejecutar: `python -m streamlit run app.py`
 3. Ingresa tu **Gemini API Key** en la barra lateral para activar el asistente.
 
-*Proyecto finalizado para prueba técnica - Enfoque Pragmático y Senior.*
+*Proyecto finalizado para prueba técnica - Enfoque Pragmático*
