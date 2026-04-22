@@ -128,24 +128,37 @@ st.divider()
 st.subheader("Asistente de Análisis (AI Powered)")
 
 def data_analyst_logic(query, df, metrics):
-    """Extrae hechos crudos para que la AI los procese"""
-    query = query.lower()
+    """Prepara un contexto enriquecido con estadísticas calculadas por Pandas para la AI"""
     try:
-        if "peor" in query or "caídas" in query or "incidentes" in query:
+        # 1. Cálculos de distribución temporal
+        # Obtenemos los top 3 momentos críticos por hora
+        hourly_summary = df[df['is_drop']].groupby('hour').size().sort_values(ascending=False).head(3).to_dict()
+        # Distribución por día de la semana
+        daily_summary = df[df['is_drop']].groupby('day_name').size().to_dict()
+        
+        # 2. Hechos deterministas adicionales según la pregunta
+        query = query.lower()
+        specific_fact = ""
+        if "peor" in query or "cuándo" in query or "momento" in query:
             peor_dia = df[df['is_drop']].groupby('date').size().idxmax()
             conteo = df[df['is_drop']].groupby('date').size().max()
-            return f"HECHO: El peor día fue el {peor_dia} con {conteo} incidentes detectados."
+            specific_fact = f"DATO CRÍTICO: El peor día fue {peor_dia} con {conteo} caídas."
+
+        # 3. Construcción del Contexto Maestro
+        context = f"""
+        INFORME TÉCNICO DE ESTABILIDAD:
+        - Total registros: {len(df):,}
+        - Eventos de caída detectados: {metrics['num_events']}
+        - Volatilidad del sistema (StdDev): {metrics['vol_global']:.2f}
+        - Resiliencia (Tiempo promedio de recuperación): {metrics['avg_recovery_sec']:.1f} segundos.
+        - {specific_fact}
         
-        if "recuperación" in query or "resiliencia" in query:
-            return f"HECHO: El tiempo promedio de recuperación es {metrics['avg_recovery_sec']/60:.2f} min. El máximo es {metrics['max_recovery_sec']/60:.2f} min."
-        
-        if "volatibilidad" in query or "volatilidad" in query or "variación" in query:
-            return f"HECHO: La volatilidad global es {metrics['vol_global']:,.2f} (StdDev)."
-        
-        # Resumen general por defecto
-        return f"HECHO GENERAL: Hay {metrics['num_events']} incidentes en total. Caída media {metrics['avg_relative_drop_pct']:.2f}%."
-    except Exception:
-        return "No hay suficientes datos de incidentes para esta consulta."
+        PATRONES HORARIOS (Horas con más incidentes): {hourly_summary if hourly_summary else "Sin incidentes."}
+        PATRONES SEMANALES (Distribución por día): {daily_summary if daily_summary else "Sin incidentes."}
+        """
+        return context
+    except Exception as e:
+        return f"Error procesando datos: {str(e)}"
 
 def ask_gemini(question, context, key):
     """Analista con múltiples fallbacks para máxima confiabilidad"""
